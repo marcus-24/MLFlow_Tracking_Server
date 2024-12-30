@@ -6,7 +6,12 @@ The purpose of this repository is to create an cloud agnostic MLFlow server to k
 
 - Todo: Create a PostgreSQL service in docker
 
-# Starting the service
+## Required software
+
+- https://docs.docker.com/get-started/get-docker/
+- https://docs.docker.com/compose/install/
+
+## Starting the service
 
 The services required are created in its designated docker containers. Before running the docker compose file, you will need to update the configurations in the `config.env` to add connection parameters for PostgreSQL, MinIO and MLflow.
 

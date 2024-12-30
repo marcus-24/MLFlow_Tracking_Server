@@ -1,5 +1,4 @@
-# mlflow==2.17.2
-mlflow[extras] 
+mlflow[extras]
 psycopg2-binary 
 boto3 
 cryptography 
