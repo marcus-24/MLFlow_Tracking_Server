@@ -40,8 +40,7 @@ services:
       - MINIO_PORT=${MINIO_PORT}
       - MINIO_STORAGE_USE_HTTPS=${MINIO_STORAGE_USE_HTTPS}
       - MINIO_CONSOLE_ADDRESS=${MINIO_CONSOLE_ADDRESS}
-    command: minio server /data
-
+    command: minio server --console-address ${MINIO_CONSOLE_ADDRESS} /data
     healthcheck:
       test:
         [
