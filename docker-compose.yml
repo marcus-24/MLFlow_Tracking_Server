@@ -8,8 +8,8 @@ services:
     container_name: mlflow_db
     expose:
       - "${PG_PORT}:${PG_PORT}"
-    # networks:
-    #   - backend
+    networks:
+      - backend
     environment:
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_PASSWORD=${PG_PASSWORD}
@@ -30,9 +30,9 @@ services:
     ports:
       - "${MINIO_PORT}:${MINIO_PORT}"
       - "${MINIO_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}"
-    # networks:
-    #   - frontend
-    #   - backend
+    networks:
+      - frontend
+      - backend
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
@@ -47,30 +47,17 @@ services:
       timeout: 10s
       retries: 5
 
-  minio-create-bucket: # possible solution; https://github.com/minio/mc/issues/3421#issuecomment-699597252
+  minio-create-bucket:
     image: minio/mc
     container_name: create-minio-bucket
-    # networks:
-    #   - backend
     depends_on:
       s3:
         condition: service_healthy
-    network_mode: service:s3
+    network_mode: service:s3 # needed to communicate 'mc' commands below.
     entrypoint: /bin/sh
     command: -c "
-      mc config host add myminio http://localhost:${MINIO_PORT} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_ACCESS_KEY} &&
-      mc mb myminio/wemadeitbucket
-      "
-
-    # entrypoint: >
-    #   bash -c "
-    #   mc alias set minio http://127.0.0.1:${MINIO_CONSOLE_PORT} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_ACCESS_KEY} &&
-    #   if ! mc ls minio | grep --quiet marcusbucket; then
-    #     mc mb minio/marcusbucket
-    #   else
-    #     echo 'bucket already exists'
-    #   fi
-    #   "
+      mc config host add myminio http://s3:${MINIO_PORT} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_ACCESS_KEY} &&
+      mc mb myminio/${MLFLOW_BUCKET_NAME}"
 
   tracking_server:
     restart: always
@@ -81,9 +68,9 @@ services:
       - db
     ports:
       - "${MLFLOW_PORT}:5000"
-    # networks:
-    #   - frontend
-    #   - backend
+    networks:
+      - frontend
+      - backend
     environment:
       - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
       - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_ACCESS_KEY}
@@ -100,8 +87,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-# networks:
-#   frontend:
-#     driver: bridge
-#   backend:
-#     driver: bridge
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
