@@ -4,8 +4,6 @@
 
 The purpose of this repository is to create an cloud agnostic MLFlow server to keep track of machine learning operations (MLOPs) in a shared location. This service is also dependent on a PostgreSQL database to store the MLFlow metadata (run name, model input parameters, etc.) of each run and MinIO (AWS S3 alternative) to store ML Artifacts (model pickle files, environment.yml, etc.).
 
-- Todo: Create a PostgreSQL service in docker
-
 ## Required software
 
 - https://docs.docker.com/get-started/get-docker/
